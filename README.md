@@ -1,3 +1,36 @@
+## ETHER GUILD PROTOCOL
+
+Setup .env variables.
+```
+DEPLOYER_PRIVATE_KEY=0x1234
+SEPOLIA_RPC_URL='https://...`
+```
+
+## Smart Contracts
+
+- **src/QuestFactory**: msg.sender as Admin, allows anyone to create New Quest (factory admin will persist to Quest)
+- **src/QuestDonation**: contructor params: @admin, @target, @creator
+
+### Quest Donation
+- MAX_DONATION(hardcoded): $5000/ year
+- Admin Must `allowToken(token, status)` to set `setPriceOracle(token, oracle)`
+- For Native ETH address(0) is used.
+
+
+## Running the Script
+
+To run the deployment script, use the following command:
+```shell
+$ forge script script/Deploy.s.sol --rpc-url sepolia
+```
+
+## Testing Smart Contracts
+
+To test the smart contracts, execute:
+```shell
+$ forge test
+```
+
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
