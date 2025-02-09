@@ -2,22 +2,29 @@
 pragma solidity ^0.8.24;
 
 import {Helper} from "./Helper.sol";
-import {DeployQuestScript} from "./1_DeployQuest.s.sol";
-import {SetupQuestScript} from "./2_SetupQuest.s.sol";
-import {InteractionQuestScript} from "./3_InteractionQuest.s.sol";
+import {DeployQuestFactoryScript} from "./1_DeployQuestFactory.s.sol";
+import {SetupQuestFactoryScript} from "./2_SetupQuestFactory.s.sol";
+import {CreateQuestDonationScript} from "./3_CreateQuestDonation.s.sol";
+import {InteractionQuestScript} from "./4_InteractionQuest.s.sol";
 
 contract DeployScript is Helper {
     function run() external {
         //DEPLOYS FACTORY AND FIRST EXAMPLE QUEST
-        DeployQuestScript deployQuest = new DeployQuestScript();
-        (, address firstQuest) = deployQuest.run();
+        DeployQuestFactoryScript deployQuest = new DeployQuestFactoryScript();
+        // address factoryAddress =
+        deployQuest.run();
 
         // ALLOW TOKENS AND ADD ORACLE
-        SetupQuestScript setupQuest = new SetupQuestScript();
-        setupQuest.run(firstQuest);
+        SetupQuestFactoryScript setupQuest = new SetupQuestFactoryScript();
+        setupQuest.run();
+
+        // CREATES FIRST QUEST
+        CreateQuestDonationScript createQuest = new CreateQuestDonationScript();
+        // address firstQuest =
+        createQuest.run();
 
         // INTERACTING WITH FIRST QUEST
         InteractionQuestScript interactingQuest = new InteractionQuestScript();
-        interactingQuest.run(firstQuest);
+        interactingQuest.run();
     }
 }

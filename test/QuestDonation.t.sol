@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {QuestDonation} from "../src/QuestDonation.sol";
+import {QuestFactory} from "../src/QuestFactory.sol";
 import {MockV3Aggregator} from "./mocks/MockV3Aggregator.sol";
 import {MockERC20} from "./mocks/MockERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -39,14 +40,17 @@ contract QuestDonationTest is Test {
         mockUSDC = new MockERC20("Mock USDC", "USDC", 6);
 
         // Deploy QuestDonation contract with mock params
-        questDonation = new QuestDonation(owner, targetAmount, owner);
+        QuestFactory questFactory = new QuestFactory();
 
         // Allow ETH, USDC and set oracle
-        questDonation.allowToken(address(0), true); // Replace address(0) with the actual token address if needed
-        questDonation.setPriceOracle(address(0), address(mockPriceFeedETH)); // Assuming setPriceOracle is a function in QuestDonation
+        questFactory.allowToken(address(0), true); // Replace address(0) with the actual token address if needed
+        questFactory.setPriceOracle(address(0), address(mockPriceFeedETH)); // Assuming setPriceOracle is a function in QuestDonation
 
-        questDonation.allowToken(address(mockUSDC), true);
-        questDonation.setPriceOracle(address(mockUSDC), address(mockPriceFeedUSDC));
+        questFactory.allowToken(address(mockUSDC), true);
+        questFactory.setPriceOracle(address(mockUSDC), address(mockPriceFeedUSDC));
+
+        questDonation = QuestDonation(questFactory.createQuest(targetAmount));
+        // questDonation = new QuestDonation(owner, targetAmount, owner);
 
         // Fund test addresses with ETH
         vm.deal(donor1, 10 ether);
