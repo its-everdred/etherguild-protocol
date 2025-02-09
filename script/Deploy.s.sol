@@ -8,10 +8,9 @@ import {InteractionQuestScript} from "./3_InteractionQuest.s.sol";
 
 contract DeployScript is Helper {
     function run() external {
-
         //DEPLOYS FACTORY AND FIRST EXAMPLE QUEST
         DeployQuestScript deployQuest = new DeployQuestScript();
-        ( , address firstQuest) = deployQuest.run();
+        (, address firstQuest) = deployQuest.run();
 
         // ALLOW TOKENS AND ADD ORACLE
         SetupQuestScript setupQuest = new SetupQuestScript();
@@ -20,6 +19,5 @@ contract DeployScript is Helper {
         // INTERACTING WITH FIRST QUEST
         InteractionQuestScript interactingQuest = new InteractionQuestScript();
         interactingQuest.run(firstQuest);
-        
     }
 }
