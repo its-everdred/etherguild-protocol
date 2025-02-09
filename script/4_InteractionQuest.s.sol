@@ -7,7 +7,9 @@ import {QuestDonation} from "../src/QuestDonation.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract InteractionQuestScript is Script, Helper {
-    function run(address questDonationAddress) external {
+    function run() external {
+        address questDonationAddress = vm.envAddress("DONATION_ADDRESS");
+
         uint256 deployerPrivateKey = getDeployerPrivateKey();
         vm.startBroadcast(deployerPrivateKey);
 
@@ -23,14 +25,14 @@ contract InteractionQuestScript is Script, Helper {
 
         // Make donations
         // ETH donation
-        questDonation.donateETH{value: 0.1 ether}(); // Donate ETH
-        console.log("Donated 0.1 ETH");
+        questDonation.donateETH{value: 0.01 ether}(); // Donate ETH
+        console.log("Donated 0.01 ETH");
 
         // USDC donation
-        uint256 usdcAmount = 100 * 10 ** 6;
+        uint256 usdcAmount = 1 * 10 ** 6;
         IERC20(USDC).approve(address(questDonation), usdcAmount); // DONATE USDC
         questDonation.donateERC20(USDC, usdcAmount);
-        console.log("Donated 100 USDC");
+        console.log("Donated 1 USDC");
 
         // Log balances after donations
         console.log("===QUEST CONTRACT: Balances after donations ===");
