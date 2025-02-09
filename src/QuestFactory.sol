@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./QuestDonation.sol"; 
+import "./QuestDonation.sol";
 
 contract QuestFactory {
     address public admin;
 
     constructor() {
-        admin = msg.sender;  // Set contract deployer as admin
+        admin = msg.sender; // Set contract deployer as admin
     }
 
     // Structure to store quest details
@@ -22,22 +22,12 @@ contract QuestFactory {
     Quest[] public quests;
 
     // Event emitted when new quest is created
-    event QuestCreated(
-        address indexed questContract,
-        address indexed creator,
-        uint256 timestamp
-    );
+    event QuestCreated(address indexed questContract, address indexed creator, uint256 timestamp);
 
     // Function to create new quest
-    function createQuest(
-        uint256 _targetAmount
-    ) external returns (address) {
+    function createQuest(uint256 _targetAmount) external returns (address) {
         // Deploy new QuestDonation contract
-        QuestDonation newQuest = new QuestDonation(
-            admin,
-            _targetAmount,
-            msg.sender
-        );
+        QuestDonation newQuest = new QuestDonation(admin, _targetAmount, msg.sender);
 
         // Store quest details
         quests.push(
@@ -50,11 +40,7 @@ contract QuestFactory {
         );
 
         // Emit event
-        emit QuestCreated(
-            address(newQuest),
-            msg.sender,
-            block.timestamp
-        );
+        emit QuestCreated(address(newQuest), msg.sender, block.timestamp);
 
         return address(newQuest);
     }
@@ -65,19 +51,13 @@ contract QuestFactory {
     }
 
     // Get quest by index
-    function getQuestByIndex(uint256 _index) external view returns (
-        address questContract,
-        uint256 targetAmount,
-        address creator,
-        uint256 timestamp
-    ) {
+    function getQuestByIndex(uint256 _index)
+        external
+        view
+        returns (address questContract, uint256 targetAmount, address creator, uint256 timestamp)
+    {
         require(_index < quests.length, "Quest index out of bounds");
         Quest memory quest = quests[_index];
-        return (
-            quest.questContract,
-            quest.targetAmount,
-            quest.creator,
-            quest.timestamp
-        );
+        return (quest.questContract, quest.targetAmount, quest.creator, quest.timestamp);
     }
 }

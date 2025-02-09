@@ -26,29 +26,24 @@ contract QuestDonation is Ownable {
     event FundsWithdrawn(address indexed token, uint256 amount);
     event PriceOracleSet(address indexed token, address indexed oracle);
 
-    constructor(
-        address _admin,
-        uint256 _targetAmount,
-        address _creator
-    ) Ownable(_admin) {
+    constructor(address _admin, uint256 _targetAmount, address _creator) Ownable(_admin) {
         require(_admin != address(0), "Invalid admin address");
         require(_creator != address(0), "Invalid creator address");
         require(_targetAmount > 0, "Invalid target amount");
-        
+
         admin = _admin;
         targetAmount = _targetAmount;
         creator = _creator;
     }
 
-    
     modifier withinDonationLimit(address token, uint256 amount) {
         require(address(priceOracles[token]) != address(0), "No price oracle set for token");
         AggregatorV3Interface priceFeed = priceOracles[token];
-        (, int256 price, , , ) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.latestRoundData();
         uint8 priceDecimals = priceFeed.decimals();
-        
+
         require(price > 0, "Invalid price");
-        
+
         uint256 usdValue;
         if (token == address(0)) {
             // Native token (ETH) has 18 decimals
@@ -59,23 +54,25 @@ contract QuestDonation is Ownable {
             // Adjust the calculation based on token decimals
             usdValue = (amount * uint256(price)) / (10 ** tokenDecimals) / (10 ** priceDecimals);
         }
-        
+
         uint256 lastYear = lastDonationTimestamp[msg.sender];
         if (block.timestamp - lastYear > YEAR) {
             yearlyDonations[msg.sender] = 0;
             lastDonationTimestamp[msg.sender] = block.timestamp;
         }
-        require(yearlyDonations[msg.sender] + usdValue <= MAX_DONATION, "Donation exceeds $5000/year. Contact info@etherguild.xyz");
-        
+        require(
+            yearlyDonations[msg.sender] + usdValue <= MAX_DONATION,
+            "Donation exceeds $5000/year. Contact info@etherguild.xyz"
+        );
+
         yearlyDonations[msg.sender] += usdValue;
         _;
     }
 
     function donateETH() external payable withinDonationLimit(address(0), msg.value) {
-        
         require(msg.value > 0, "Donation amount must be greater than 0");
         AggregatorV3Interface priceFeed = priceOracles[address(0)];
-        (, int256 price, , , ) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.latestRoundData();
         uint8 priceDecimals = priceFeed.decimals();
         emit DonationReceived(msg.sender, address(0), msg.value, msg.value * uint256(price) / (10 ** priceDecimals));
     }
@@ -84,7 +81,7 @@ contract QuestDonation is Ownable {
         require(allowedTokens[token], "Token not allowed");
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
         AggregatorV3Interface priceFeed = priceOracles[token];
-        (, int256 price, , , ) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.latestRoundData();
         uint8 priceDecimals = priceFeed.decimals();
         emit DonationReceived(msg.sender, token, amount, amount * uint256(price) / (10 ** priceDecimals));
     }
@@ -100,11 +97,10 @@ contract QuestDonation is Ownable {
     function setPriceOracle(address token, address oracle) external onlyOwner {
         require(allowedTokens[token], "Token not allowed");
         require(oracle != address(0), "Invalid oracle address");
-        
+
         priceOracles[token] = AggregatorV3Interface(oracle);
         emit PriceOracleSet(token, oracle);
     }
-
 
     function withdraw(address token, uint256 amount) external {
         require(msg.sender == admin, "Only admin can withdraw");

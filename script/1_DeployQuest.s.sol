@@ -5,10 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {Helper} from "./Helper.sol";
 import {QuestFactory} from "../src/QuestFactory.sol";
 
-
-
 contract DeployQuestScript is Script, Helper {
-
     function run() external returns (address questFactoryAddress, address questDonationAddress) {
         uint256 deployerPrivateKey = getDeployerPrivateKey();
         vm.startBroadcast(deployerPrivateKey);
@@ -16,7 +13,7 @@ contract DeployQuestScript is Script, Helper {
         // Deploy QuestFactory with constructor parameters
         // Sets msg.sender as admin for factory and all future quests created
         QuestFactory questFactory = new QuestFactory();
-        questFactoryAddress =  address(questFactory);
+        questFactoryAddress = address(questFactory);
 
         // Create a new Quest with a target amount (for example, 1 ether)
         // Msg.sender is the creator of the quest, but only admin can withdraw funds
@@ -29,6 +26,4 @@ contract DeployQuestScript is Script, Helper {
 
         vm.stopBroadcast();
     }
-
 }
-    
